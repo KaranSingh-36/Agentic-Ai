@@ -20,7 +20,27 @@ def _load_env_file() -> None:
 			os.environ[key] = value
 
 
+def _load_streamlit_secrets() -> None:
+	try:
+		import streamlit as st
+	except Exception:
+		return
+
+	for key in ("API_KEY", "BASE_URL", "MODEL_NAME"):
+		if key in os.environ:
+			continue
+
+		try:
+			value = st.secrets.get(key)
+		except Exception:
+			value = None
+
+		if value:
+			os.environ[key] = str(value)
+
+
 _load_env_file()
+_load_streamlit_secrets()
 
 API_KEY = os.getenv("API_KEY", "")
 BASE_URL = os.getenv("BASE_URL", "https://api.groq.com/openai/v1")

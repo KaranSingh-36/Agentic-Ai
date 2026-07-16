@@ -1,6 +1,11 @@
 from openai import OpenAI
 from Config import API_KEY,BASE_URL,MODEL_NAME
 
+if not API_KEY:
+    raise RuntimeError(
+        "Missing API_KEY. Set it in environment variables, Streamlit secrets, or local .env."
+    )
+
 client =OpenAI(
     api_key = API_KEY,
     base_url = BASE_URL,
