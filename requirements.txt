@@ -1,2 +1,6 @@
 openai>=1.0.0
 streamlit
+requests
+pypdf
+reportlab
+Pillow
