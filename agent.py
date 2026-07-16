@@ -5,10 +5,14 @@ from parser import parse_tool_call
 import json
 import importlib.util
 import os
+import sys
 from types import ModuleType
 from typing import Any
 
 TOOLS_DIR = os.path.join(os.path.dirname(__file__), "tools")
+
+if TOOLS_DIR not in sys.path:
+    sys.path.insert(0, TOOLS_DIR)
 
 
 def _load_tool_module(module_name: str, file_name: str) -> ModuleType:
@@ -31,6 +35,7 @@ bmi_tool = _load_tool_module("bmi_tool", "bmi_calculator.py")
 movie_tool = _load_tool_module("movie_tool", "movie_search.py")
 book_tool = _load_tool_module("book_tool", "book_search.py")
 music_tool = _load_tool_module("music_tool", "music_search.py")
+web_tool = _load_tool_module("web_tool", "web_search.py")
 
 
 def _execute_tool(tool_name: str, arguments: dict[str, Any]):
@@ -89,6 +94,12 @@ def _execute_tool(tool_name: str, arguments: dict[str, Any]):
             return music_tool.execute(arguments)
         except Exception as e:
             return f"Music Search Error: {e}"
+
+    if tool_name == "web_search":
+        try:
+            return web_tool.execute(arguments)
+        except Exception as e:
+            return f"Web Search Error: {e}"
 
     return "Unknown tool."
 

@@ -1,9 +1,6 @@
 from __future__ import annotations
 
-import requests
-
-
-API_URL = "https://itunes.apple.com/search"
+from web_search import google_search
 
 
 def execute(arguments: dict) -> str:
@@ -12,36 +9,16 @@ def execute(arguments: dict) -> str:
         if not query:
             raise ValueError("Missing music search query.")
 
-        response = requests.get(
-            API_URL,
-            params={
-                "term": query,
-                "media": "music",
-                "limit": 5,
-            },
-            timeout=10,
-        )
-        response.raise_for_status()
-
-        data = response.json()
-        results = data.get("results", [])
+        results = google_search(f"{query} song music", limit=5)
 
         if not results:
             return f'No music tracks found for "{query}".'
 
         lines = [f'Music search results for "{query}":']
         for index, item in enumerate(results, start=1):
-            track = item.get("trackName") or item.get("collectionName") or "Unknown track"
-            artist = item.get("artistName", "Unknown artist")
-            album = item.get("collectionName", "Unknown album")
-            genre = item.get("primaryGenreName", "Unknown genre")
-            release_date = item.get("releaseDate", "")
-            year = release_date[:4] if release_date else "Unknown year"
-            view_url = item.get("trackViewUrl") or item.get("collectionViewUrl") or ""
-            lines.append(
-                f"{index}. {track} - {artist} - {album} ({year}) - {genre}"
-                + (f" - {view_url}" if view_url else "")
-            )
+            title = item.get("title", "Unknown result")
+            view_url = item.get("url", "")
+            lines.append(f"{index}. {title}" + (f" - {view_url}" if view_url else ""))
 
         return "\n".join(lines)
     except Exception as error:

@@ -1,9 +1,6 @@
 from __future__ import annotations
 
-import requests
-
-
-API_URL = "https://openlibrary.org/search.json"
+from web_search import google_search
 
 
 def execute(arguments: dict) -> str:
@@ -12,36 +9,16 @@ def execute(arguments: dict) -> str:
         if not query:
             raise ValueError("Missing book search query.")
 
-        response = requests.get(
-            API_URL,
-            params={
-                "q": query,
-                "limit": 5,
-            },
-            timeout=10,
-        )
-        response.raise_for_status()
+        results = google_search(f"{query} book", limit=5)
 
-        data = response.json()
-        docs = data.get("docs", [])
-
-        if not docs:
+        if not results:
             return f'No books found for "{query}".'
 
         lines = [f'Book search results for "{query}":']
-        for index, item in enumerate(docs[:5], start=1):
-            title = item.get("title") or "Unknown title"
-            authors = ", ".join(item.get("author_name", [])[:3]) if item.get("author_name") else "Unknown author"
-            year = item.get("first_publish_year", "Unknown year")
-            publisher = ", ".join(item.get("publisher", [])[:2]) if item.get("publisher") else ""
-            key = item.get("key", "")
-            url = f"https://openlibrary.org{key}" if key else ""
-            line = f"{index}. {title} - {authors} - {year}"
-            if publisher:
-                line += f" - {publisher}"
-            if url:
-                line += f" - {url}"
-            lines.append(line)
+        for index, item in enumerate(results, start=1):
+            title = item.get("title", "Unknown result")
+            view_url = item.get("url", "")
+            lines.append(f"{index}. {title}" + (f" - {view_url}" if view_url else ""))
 
         return "\n".join(lines)
     except Exception as error:

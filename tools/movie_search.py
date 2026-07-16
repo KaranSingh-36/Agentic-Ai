@@ -1,9 +1,6 @@
 from __future__ import annotations
 
-import requests
-
-
-API_URL = "https://itunes.apple.com/search"
+from web_search import google_search
 
 
 def execute(arguments: dict) -> str:
@@ -12,31 +9,16 @@ def execute(arguments: dict) -> str:
         if not query:
             raise ValueError("Missing movie search query.")
 
-        response = requests.get(
-            API_URL,
-            params={
-                "term": query,
-                "media": "movie",
-                "limit": 5,
-            },
-            timeout=10,
-        )
-        response.raise_for_status()
-
-        data = response.json()
-        results = data.get("results", [])
+        results = google_search(f"{query} movie", limit=5)
 
         if not results:
             return f'No movies found for "{query}".'
 
         lines = [f'Movie search results for "{query}":']
         for index, item in enumerate(results, start=1):
-            title = item.get("trackName") or item.get("collectionName") or "Unknown title"
-            release_date = item.get("releaseDate", "")
-            year = release_date[:4] if release_date else "Unknown year"
-            genre = item.get("primaryGenreName", "Unknown genre")
-            view_url = item.get("trackViewUrl") or item.get("collectionViewUrl") or ""
-            lines.append(f"{index}. {title} ({year}) - {genre}" + (f" - {view_url}" if view_url else ""))
+            title = item.get("title", "Unknown title")
+            view_url = item.get("url", "")
+            lines.append(f"{index}. {title}" + (f" - {view_url}" if view_url else ""))
 
         return "\n".join(lines)
     except Exception as error:

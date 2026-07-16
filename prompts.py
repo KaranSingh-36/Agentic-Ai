@@ -187,6 +187,23 @@ Never invent file paths.
 If no uploaded file is available, ask the user to upload one.
 
 =========================================================
+TOOL 10
+
+Name:
+web_search
+
+Purpose:
+Search the web using Google results for current or broad information.
+
+Examples
+
+User:
+Search Google for latest AI news.
+
+User:
+Find web pages about Python async programming.
+
+=========================================================
 OUTPUT FORMAT
 
 Whenever a tool is required,
@@ -285,6 +302,13 @@ Music search
 {
     "tool":"music_search",
     "query":"Shape of You"
+}
+
+Web search
+
+{
+    "tool":"web_search",
+    "query":"latest AI news"
 }
 
 =========================================================
